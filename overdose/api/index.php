@@ -18,7 +18,7 @@ if (!is_dir($sliderDir)) {
     mkdir($sliderDir, 0775, true);
 }
 
-function sendJson(mixed $data, int $status = 200): void
+function sendJson($data, int $status = 200): void
 {
     http_response_code($status);
     header('Content-Type: application/json');
@@ -36,10 +36,11 @@ function pdo(): PDO
         return $pdo;
     }
 
-    $host = "sql103.infinityfree.com";
-    $database = "if0_41995292_demo";
-    $user = "if0_41995292";
-    $password = "PZIoParcPhPIEOZ";
+    $host = "localhost";
+    $port = 3306;
+    $database = "overdose"; // change this to your exact GoDaddy database name, usually cPanelUsername_overdose
+    $user = "overdose-user"; // change this to your exact GoDaddy database user, usually cPanelUsername_overdose_user
+    $password = "overdose@2714";
 
     $dsn = "mysql:host={$host};port={$port};dbname={$database};charset=utf8mb4";
     $pdo = new PDO($dsn, $user, $password, [
@@ -106,7 +107,7 @@ function safeFilename(string $filename): string
     return bin2hex(random_bytes(8)) . '_' . $base;
 }
 
-function boolFromValue(mixed $value): bool
+function boolFromValue($value): bool
 {
     return in_array(strtolower((string) $value), ['true', '1', 't', 'yes', 'on'], true);
 }
@@ -276,7 +277,9 @@ try {
 
     if ($path === '/api/slider-images' && $method === 'GET') {
         $rows = pdo()->query('SELECT id, image_url FROM slider_images ORDER BY created_at DESC')->fetchAll();
-        sendJson(array_map(fn ($row) => ['id' => (int) $row['id'], 'url' => $row['image_url']], $rows));
+        sendJson(array_map(function ($row) {
+            return ['id' => (int) $row['id'], 'url' => $row['image_url']];
+        }, $rows));
     }
 
     if ($path === '/api/slider-images' && $method === 'POST') {
